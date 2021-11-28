@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\ProductNotBelongsToUser;
 use App\Models\Product;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Http\Resources\Product\ProductCollection;
 use App\Http\Resources\Product\ProductResource;
+use Illuminate\Support\Facades\Auth;
 
 class ProductController extends Controller
 {
@@ -50,6 +52,7 @@ class ProductController extends Controller
 
     public function update(UpdateProductRequest $request, Product $product)
     {
+        $this->checkProductUser($product);
         $request['detail']=$request->details;
         unset($request['details']);
         $product->update($request->all());
@@ -62,5 +65,10 @@ class ProductController extends Controller
     {
         $product->delete();
          return response()->json(["massage"=>"Product deleted"],203);
+    }
+    public function checkProductUser($product){
+        if(Auth::user()->id!==$product->user_id){
+            throw new ProductNotBelongsToUser;
+        }
     }
 }

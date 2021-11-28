@@ -15,6 +15,7 @@ trait ExceptionTrait
         if($this->isModel($e)){
             return $this->methodResponse();
         }
+        return parent::register($request, $e);
     }
 
     protected function isMethod($e){
